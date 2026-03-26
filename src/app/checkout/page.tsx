@@ -29,28 +29,34 @@ export default function CheckoutPage() {
   const handleSubmit = () => {
     if (!validate()) return;
 
-    // Build WhatsApp message
+    // Build WhatsApp message with Unicode escape sequences for maximum compatibility
     const itemLines = items.map(
-      item => `• ${item.product.name} x${item.quantity} — $${(item.product.price * item.quantity).toFixed(2)}`
-    ).join('\n');
+      item => `%E2%80%A2 *${item.product.name}* (x${item.quantity}) %E2%80%94 $${(item.product.price * item.quantity).toFixed(2)}`
+    ).join('%0A');
 
-    const deliveryText = deliveryOption === 'delivery' ? 'Delivery (+$1.50)' : 'Recoger en tienda';
+    const deliveryText = deliveryOption === 'delivery' ? '%F0%9F%9A%80 Delivery (+$1.50)' : '%F0%9F%8F%A0 Recoger en tienda (Gratis)';
 
-    const message = `🛒 *Nuevo Pedido - Multi Impresiones AH*\n\n` +
-      `👤 *Cliente:* ${name}\n` +
-      `📱 *Teléfono:* ${phone}\n` +
-      `🚚 *Entrega:* ${deliveryText}\n\n` +
-      `📋 *Productos:*\n${itemLines}\n\n` +
-      `${deliveryOption === 'delivery' ? `📦 Envío: $${deliveryFee.toFixed(2)}\n` : ''}` +
-      `💰 *Total: $${total.toFixed(2)}*\n\n` +
-      `¡Gracias por su pedido! 🙏`;
+    const messageParts = [
+      `%F0%9F%9B%8D *NUEVO PEDIDO - MULTI IMPRESIONES AH*%0A`,
+      `------------------------------------------%0A%0A`,
+      `%F0%9F%91%A4 *Cliente:* ${name}%0A`,
+      `%F0%9F%93%9E *Tel%C3%A9fono:* ${phone}%0A`,
+      `%F0%9F%93%8D *Entrega:* ${deliveryText}%0A%0A`,
+      `%F0%9F%93%8B *DETALLE DE PRODUCTOS:*%0A${itemLines}%0A%0A`,
+      `------------------------------------------%0A`,
+      `%F0%9F%92%B0 *RESUMEN FINAL:*%0A`,
+      `• Subtotal: $${subtotal.toFixed(2)}%0A`,
+      deliveryOption === 'delivery' ? `• Envío: $${deliveryFee.toFixed(2)}%0A` : '',
+      `%E2%9C%85 *TOTAL A PAGAR: $${total.toFixed(2)}*%0A%0A`,
+      `%C2%A1Muchas gracias por su preferencia! %E2%9C%A8`
+    ];
 
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    const finalMessage = messageParts.join('');
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${finalMessage}`;
 
     // Clear cart and redirect
     clearCart();
-    window.open(whatsappUrl, '_blank');
+    window.location.href = whatsappUrl;
   };
 
   if (items.length === 0) {
