@@ -1,7 +1,25 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useCartStore } from '@/store/cartStore';
 
 export default function Footer() {
+  const [mounted, setMounted] = useState(false);
+  const { openDrawer } = useCartStore();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Handle store access only after mount to avoid hydration mismatch
+  const handleCartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (mounted) {
+      openDrawer();
+    }
+  };
+
   return (
     <footer className="bg-azul-profundo text-white mt-auto">
       {/* Main footer content */}
@@ -41,9 +59,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/cart" className="text-white/70 hover:text-azul-cielo transition-colors">
+                <button 
+                  onClick={handleCartClick}
+                  className="text-white/70 hover:text-azul-cielo transition-colors text-left"
+                >
                   Mi Carrito
-                </Link>
+                </button>
               </li>
             </ul>
           </div>

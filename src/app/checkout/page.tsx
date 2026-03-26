@@ -2,10 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useCart } from '@/context/CartContext';
+import { useRouter } from 'next/navigation';
+import { useCartStore } from '@/store/cartStore';
 
 export default function CheckoutPage() {
-  const { items, getSubtotal, clearCart } = useCart();
+  const router = useRouter();
+  const { items, getSubtotal, clearCart, openDrawer } = useCartStore();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [deliveryOption, setDeliveryOption] = useState<'pickup' | 'delivery'>('pickup');
@@ -230,12 +232,18 @@ export default function CheckoutPage() {
               Serás redirigido a <strong className="text-green-600">WhatsApp</strong> donde un representante de la tienda te atenderá para completar tu compra.
             </p>
 
-            <Link href="/cart" className="mt-4 w-full py-2 text-azul-real hover:text-azul-brillante text-sm font-medium transition-colors flex items-center justify-center gap-1">
+            <button
+              onClick={() => {
+                router.push('/');
+                setTimeout(openDrawer, 100);
+              }}
+              className="mt-4 w-full py-2 text-azul-real hover:text-azul-brillante text-sm font-medium transition-colors flex items-center justify-center gap-1"
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Volver al Carrito
-            </Link>
+              Ver Carrito
+            </button>
           </div>
         </div>
       </div>

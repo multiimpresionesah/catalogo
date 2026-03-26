@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Category } from '@/types';
+import { useCartStore } from '@/store/cartStore';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const { openDrawer } = useCartStore();
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {

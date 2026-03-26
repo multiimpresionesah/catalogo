@@ -2,19 +2,29 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useCart } from '@/context/CartContext';
+import { useCartStore } from '@/store/cartStore';
 import Sidebar from './Sidebar';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function Navbar() {
-  const { getItemCount } = useCart();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const { getItemCount, openDrawer } = useCartStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const itemCount = getItemCount();
 
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/?search=${encodeURIComponent(searchQuery.trim())}`;
+      router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push('/');
     }
   };
 
@@ -22,11 +32,11 @@ export default function Navbar() {
     <>
       <nav className="sticky top-0 z-40 bg-azul-profundo shadow-lg">
         {/* Row 1 */}
-        <div className="flex items-center justify-between px-4 py-3 lg:px-8">
+        <div className="relative flex items-center justify-between px-4 py-2 lg:px-8 h-16">
           {/* Burger menu */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="text-white hover:text-azul-cielo transition-colors p-1"
+            className="z-10 text-white hover:text-azul-cielo transition-colors p-1"
             aria-label="Abrir menú"
           >
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,21 +45,31 @@ export default function Navbar() {
           </button>
 
           {/* Logo (center) */}
-          <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-white font-bold text-lg lg:text-xl tracking-wide hover:text-azul-cielo transition-colors whitespace-nowrap">
-            Multi Impresiones AH
-          </Link>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <Link href="/" className="pointer-events-auto flex items-center hover:opacity-80 transition-opacity">
+              <div className="relative h-12 w-48">
+                <Image
+                  src="/logo-multi.png"
+                  alt="Multi Impresiones AH Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            </Link>
+          </div>
 
           {/* Cart icon (right) */}
-          <Link href="/cart" className="relative text-white hover:text-azul-cielo transition-colors p-1">
+          <button onClick={openDrawer} className="z-10 relative text-white hover:text-azul-cielo transition-colors p-1" aria-label="Abrir carrito">
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
             </svg>
-            {itemCount > 0 && (
+            {mounted && itemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-azul-brillante text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-fade-in">
                 {itemCount}
               </span>
             )}
-          </Link>
+          </button>
         </div>
 
         {/* Row 2 */}
