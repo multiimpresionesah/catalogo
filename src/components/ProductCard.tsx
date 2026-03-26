@@ -47,13 +47,22 @@ export default function ProductCard({ product }: ProductCardProps) {
               {product.description}
             </p>
           )}
-          <div className="mt-3 flex items-center justify-between">
-            <span className="text-lg font-bold text-azul-brillante">
-              ${product.price.toFixed(2)}
-            </span>
-            <span className="text-xs text-azul-real bg-azul-palido px-2 py-1 rounded-full font-medium group-hover:bg-azul-cielo/30 transition-colors">
-              Ver más →
-            </span>
+          <div className="mt-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-bold text-azul-brillante">
+                ${product.price.toFixed(2)}
+              </span>
+              <span className="text-xs text-azul-real font-medium">
+                {product.category?.name}
+              </span>
+            </div>
+            
+            <div className="w-full py-2.5 bg-azul-brillante group-hover:bg-azul-real text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 shadow-sm group-hover:shadow-md">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
+              </svg>
+              Añadir al Carrito
+            </div>
           </div>
         </div>
       </div>
