@@ -5,6 +5,7 @@ import { CartItem, Product } from '@/types';
 interface CartState {
   items: CartItem[];
   isDrawerOpen: boolean;
+  searchQuery: string;
   openDrawer: () => void;
   closeDrawer: () => void;
   toggleDrawer: () => void;
@@ -14,6 +15,7 @@ interface CartState {
   clearCart: () => void;
   getSubtotal: () => number;
   getItemCount: () => number;
+  setSearchQuery: (query: string) => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -21,10 +23,12 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
       isDrawerOpen: false,
+      searchQuery: '',
 
       openDrawer: () => set({ isDrawerOpen: true }),
       closeDrawer: () => set({ isDrawerOpen: false }),
       toggleDrawer: () => set((state) => ({ isDrawerOpen: !state.isDrawerOpen })),
+      setSearchQuery: (query) => set({ searchQuery: query }),
 
       addToCart: (product, quantity, image) => {
         set((state) => {

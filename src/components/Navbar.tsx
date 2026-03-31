@@ -1,32 +1,72 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
 import Sidebar from './Sidebar';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
+function SearchInput() {
+  const { searchQuery, setSearchQuery } = useCartStore();
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  return (
+    <form onSubmit={(e) => e.preventDefault()} className="flex-1 relative">
+      <input
+        type="text"
+        placeholder="Buscar productos..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+        className="w-full py-2 pl-10 pr-4 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-azul-brillante focus:bg-white/20 transition-all text-sm"
+      />
+      <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      {searchQuery && (
+        <button
+          type="button"
+          onClick={() => setSearchQuery('')}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+          aria-label="Limpiar búsqueda"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      )}
+    </form>
+  );
+}
+
+function SearchInputFallback() {
+  return (
+    <div className="flex-1 relative">
+      <input
+        type="text"
+        placeholder="Buscar productos..."
+        disabled
+        className="w-full py-2 pl-10 pr-4 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-azul-brillante focus:bg-white/20 transition-all text-sm opacity-50"
+      />
+      <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+  );
+}
+
 export default function Navbar() {
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const { getItemCount, openDrawer } = useCartStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const itemCount = getItemCount();
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/?search=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      router.push('/');
-    }
-  };
+  const itemCount = mounted ? getItemCount() : 0;
 
   return (
     <>
@@ -64,7 +104,7 @@ export default function Navbar() {
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
             </svg>
-            {mounted && itemCount > 0 && (
+            {itemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-azul-brillante text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-fade-in">
                 {itemCount}
               </span>
@@ -88,18 +128,9 @@ export default function Navbar() {
           </a>
 
           {/* Search bar */}
-          <form onSubmit={handleSearch} className="flex-1 relative">
-            <input
-              type="text"
-              placeholder="Buscar productos..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full py-2 pl-10 pr-4 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-azul-brillante focus:bg-white/20 transition-all text-sm"
-            />
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </form>
+          <Suspense fallback={<SearchInputFallback />}>
+            <SearchInput />
+          </Suspense>
         </div>
       </nav>
 

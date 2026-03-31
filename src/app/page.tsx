@@ -1,17 +1,20 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Product, Category } from '@/types';
 import HeroSlider from '@/components/HeroSlider';
 import CategoryFilter from '@/components/CategoryFilter';
 import ProductCard from '@/components/ProductCard';
+import { useCartStore } from '@/store/cartStore';
 
 function HomeContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const categoryParam = searchParams.get('category');
-  const searchParam = searchParams.get('search');
+
+  const { searchQuery, setSearchQuery } = useCartStore();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -48,13 +51,13 @@ function HomeContent() {
 
   const filteredProducts = useMemo(() => {
     let result = products;
-    
+
     if (selectedCategory) {
       result = result.filter(p => p.category?.slug === selectedCategory);
     }
-    
-    if (searchParam) {
-      const term = searchParam.toLowerCase();
+
+    if (searchQuery.trim()) {
+      const term = searchQuery.trim().toLowerCase();
       result = result.filter(
         p =>
           p.name.toLowerCase().includes(term) ||
@@ -63,18 +66,26 @@ function HomeContent() {
     }
 
     return result;
-  }, [products, selectedCategory, searchParam]);
+  }, [products, selectedCategory, searchQuery]);
 
   const handleCategorySelect = (slug: string | null) => {
     setSelectedCategory(slug);
-    const url = new URL(window.location.href);
+    // Clear search when selecting a category
+    setSearchQuery('');
+    const params = new URLSearchParams(searchParams?.toString() || '');
     if (slug) {
-      url.searchParams.set('category', slug);
+      params.set('category', slug);
     } else {
-      url.searchParams.delete('category');
+      params.delete('category');
     }
-    window.history.pushState({}, '', url.toString());
+    router.push(`/?${params.toString()}`, { scroll: false });
   };
+
+  const pageTitle = selectedCategory
+    ? categories.find(c => c.slug === selectedCategory)?.name || 'Productos'
+    : searchQuery.trim()
+      ? `Resultados para "${searchQuery.trim()}"`
+      : 'Todos los Productos';
 
   return (
     <div>
@@ -92,16 +103,20 @@ function HomeContent() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-bold text-azul-profundo">
-              {selectedCategory
-                ? categories.find(c => c.slug === selectedCategory)?.name || 'Productos'
-                : searchParam
-                  ? `Resultados para "${searchParam}"`
-                  : 'Todos los Productos'}
+              {pageTitle}
             </h2>
             <p className="text-sm text-gray-500 mt-1">
               {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
             </p>
           </div>
+          {searchQuery.trim() && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="text-sm text-azul-profundo hover:text-azul-brillante transition-colors underline underline-offset-2"
+            >
+              Limpiar búsqueda
+            </button>
+          )}
         </div>
 
         {loading ? (
