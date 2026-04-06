@@ -3,11 +3,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Slider } from '@/types';
+import { useSettingsStore } from '@/store/settingsStore';
 
 export default function HeroSlider() {
   const [sliders, setSliders] = useState<Slider[]>([]);
   const [current, setCurrent] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const { getSetting } = useSettingsStore();
 
   useEffect(() => {
     async function fetchSliders() {
@@ -48,7 +50,7 @@ export default function HeroSlider() {
     return (
       <div className="w-full h-[300px] sm:h-[400px] lg:h-[500px] bg-gradient-to-r from-azul-profundo to-azul-real flex items-center justify-center">
         <div className="text-center text-white">
-          <h2 className="text-3xl lg:text-5xl font-bold mb-3">Multi Impresiones AH</h2>
+          <h2 className="text-3xl lg:text-5xl font-bold mb-3">{getSetting('store_name', 'Multi Impresiones AH')}</h2>
           <p className="text-lg lg:text-xl text-white/80">Impresiones de alta calidad para tu negocio</p>
         </div>
       </div>

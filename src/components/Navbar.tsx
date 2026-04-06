@@ -70,7 +70,7 @@ export default function Navbar() {
   }, [fetchSettings]);
 
   const itemCount = mounted ? getItemCount() : 0;
-  const logoUrl = getSetting('logo_url', '/logo-multi.png');
+  const logoUrl = getSetting('store_logo', '/logo-multi.png');
   const storeName = getSetting('store_name', 'Multi Impresiones AH');
 
   return (
