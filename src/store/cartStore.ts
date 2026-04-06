@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { CartItem, Product } from '@/types';
+import { CartItem, Product, ProductVariant } from '@/types';
+
+// Unique key for a cart item: productId + optional variantId
+function itemKey(productId: string, variantId?: string) {
+  return variantId ? `${productId}::${variantId}` : productId;
+}
 
 interface CartState {
   items: CartItem[];
@@ -9,9 +14,9 @@ interface CartState {
   openDrawer: () => void;
   closeDrawer: () => void;
   toggleDrawer: () => void;
-  addToCart: (product: Product, quantity: number, image: string) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: Product, quantity: number, image: string, variant?: ProductVariant) => void;
+  removeFromCart: (productId: string, variantId?: string) => void;
+  updateQuantity: (productId: string, quantity: number, variantId?: string) => void;
   clearCart: () => void;
   getSubtotal: () => number;
   getItemCount: () => number;
@@ -30,13 +35,16 @@ export const useCartStore = create<CartState>()(
       toggleDrawer: () => set((state) => ({ isDrawerOpen: !state.isDrawerOpen })),
       setSearchQuery: (query) => set({ searchQuery: query }),
 
-      addToCart: (product, quantity, image) => {
+      addToCart: (product, quantity, image, variant) => {
         set((state) => {
-          const existing = state.items.find(item => item.product.id === product.id);
+          const key = itemKey(product.id, variant?.id);
+          const existing = state.items.find(
+            (item) => itemKey(item.product.id, item.variant?.id) === key
+          );
           if (existing) {
             return {
-              items: state.items.map(item =>
-                item.product.id === product.id
+              items: state.items.map((item) =>
+                itemKey(item.product.id, item.variant?.id) === key
                   ? { ...item, quantity: item.quantity + quantity }
                   : item
               ),
@@ -44,28 +52,33 @@ export const useCartStore = create<CartState>()(
             };
           }
           return {
-            items: [...state.items, { product, quantity, image }],
+            items: [...state.items, { product, quantity, image, variant }],
             isDrawerOpen: true,
           };
         });
       },
 
-      removeFromCart: (productId) => {
+      removeFromCart: (productId, variantId) => {
         set((state) => ({
-          items: state.items.filter(item => item.product.id !== productId),
+          items: state.items.filter(
+            (item) => itemKey(item.product.id, item.variant?.id) !== itemKey(productId, variantId)
+          ),
         }));
       },
 
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: (productId, quantity, variantId) => {
+        const key = itemKey(productId, variantId);
         if (quantity <= 0) {
           set((state) => ({
-            items: state.items.filter(item => item.product.id !== productId),
+            items: state.items.filter(
+              (item) => itemKey(item.product.id, item.variant?.id) !== key
+            ),
           }));
           return;
         }
         set((state) => ({
-          items: state.items.map(item =>
-            item.product.id === productId ? { ...item, quantity } : item
+          items: state.items.map((item) =>
+            itemKey(item.product.id, item.variant?.id) === key ? { ...item, quantity } : item
           ),
         }));
       },
@@ -73,7 +86,10 @@ export const useCartStore = create<CartState>()(
       clearCart: () => set({ items: [] }),
 
       getSubtotal: () => {
-        return get().items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+        return get().items.reduce((sum, item) => {
+          const price = item.variant ? item.variant.price : item.product.price;
+          return sum + price * item.quantity;
+        }, 0);
       },
 
       getItemCount: () => {

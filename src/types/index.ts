@@ -8,6 +8,16 @@ export interface Category {
   created_at: string;
 }
 
+export interface ProductVariant {
+  id: string;
+  product_id: string;
+  name: string;
+  price: number;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -18,8 +28,10 @@ export interface Product {
   is_featured: boolean;
   created_at: string;
   updated_at: string;
+  tags: string[] | null;
   category?: Category;
   images?: ProductImage[];
+  product_variants?: ProductVariant[];
 }
 
 export interface ProductImage {
@@ -53,4 +65,5 @@ export interface CartItem {
   product: Product;
   quantity: number;
   image: string;
+  variant?: ProductVariant;
 }

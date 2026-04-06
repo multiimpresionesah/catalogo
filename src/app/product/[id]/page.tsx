@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { Product } from '@/types';
+import { Product, ProductVariant } from '@/types';
 import { useCartStore } from '@/store/cartStore';
 
 export default function ProductDetailPage() {
@@ -17,13 +17,14 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
 
   useEffect(() => {
     async function fetchProduct() {
       setLoading(true);
       const { data } = await supabase
         .from('products')
-        .select(`*, category:categories(*), images:product_images(*)`)
+        .select(`*, category:categories(*), images:product_images(*), product_variants(*)`)
         .eq('id', params.id)
         .single();
 
@@ -31,6 +32,16 @@ export default function ProductDetailPage() {
         // Sort images
         if (data.images) {
           data.images.sort((a: { display_order: number }, b: { display_order: number }) => a.display_order - b.display_order);
+        }
+        // Sort variants by display_order
+        if (data.product_variants) {
+          data.product_variants = data.product_variants
+            .filter((v: ProductVariant) => v.is_active)
+            .sort((a: ProductVariant, b: ProductVariant) => a.display_order - b.display_order);
+          // Select first variant by default
+          if (data.product_variants.length > 0) {
+            setSelectedVariant(data.product_variants[0]);
+          }
         }
         setProduct(data);
       }
@@ -42,10 +53,13 @@ export default function ProductDetailPage() {
   const handleAddToCart = () => {
     if (!product) return;
     const image = product.images?.[0]?.image_url || '';
-    addToCart(product, quantity, image);
+    addToCart(product, quantity, image, selectedVariant ?? undefined);
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
+
+  const displayPrice = selectedVariant ? selectedVariant.price : product?.price ?? 0;
+  const hasVariants = (product?.product_variants?.length ?? 0) > 0;
 
   if (loading) {
     return (
@@ -154,10 +168,33 @@ export default function ProductDetailPage() {
             {product.name}
           </h1>
 
+          {/* Tags */}
+          {product.tags && product.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {product.tags.map((tag) => (
+                <Link
+                  key={tag}
+                  href={`/?tag=${encodeURIComponent(tag)}`}
+                  className="inline-flex items-center gap-2 text-xs font-bold text-azul-brillante bg-azul-palido/40 hover:bg-azul-brillante hover:text-white px-3 py-1.5 rounded-lg border border-azul-cielo/30 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5 group"
+                >
+                  <svg className="w-3 h-3 text-azul-brillante group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 8.5C4.67 8.5 4 7.83 4 7s.67-1.5 1.5-1.5S7 6.17 7 7s-.67 1.5-1.5 1.5z" />
+                  </svg>
+                  {tag}
+                </Link>
+              ))}
+            </div>
+          )}
+
           {/* Price */}
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-azul-brillante">${product.price.toFixed(2)}</span>
+            <span className="text-3xl font-bold text-azul-brillante transition-all duration-300">
+              ${displayPrice.toFixed(2)}
+            </span>
             <span className="text-sm text-gray-400">USD</span>
+            {hasVariants && !selectedVariant && (
+              <span className="text-sm text-gray-400">(precio base)</span>
+            )}
           </div>
 
           {/* Description */}
@@ -169,6 +206,33 @@ export default function ProductDetailPage() {
 
           {/* Divider */}
           <div className="border-t border-azul-cielo/30" />
+
+          {/* Variant Selector */}
+          {hasVariants && (
+            <div>
+              <label className="block text-sm font-semibold text-azul-profundo mb-3">
+                Variaciones
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {product.product_variants!.map((variant) => (
+                  <button
+                    key={variant.id}
+                    onClick={() => setSelectedVariant(variant)}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold border-2 transition-all duration-200 ${
+                      selectedVariant?.id === variant.id
+                        ? 'bg-azul-brillante border-azul-brillante text-white shadow-md shadow-azul-brillante/20 scale-105'
+                        : 'bg-white border-azul-cielo/40 text-azul-profundo hover:border-azul-brillante hover:text-azul-brillante'
+                    }`}
+                  >
+                    <span>{variant.name}</span>
+                    <span className={`ml-2 text-xs ${selectedVariant?.id === variant.id ? 'text-white/80' : 'text-azul-brillante'}`}>
+                      ${variant.price.toFixed(2)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Quantity selector */}
           <div>
@@ -200,16 +264,26 @@ export default function ProductDetailPage() {
           <div className="bg-azul-palido rounded-xl p-4">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-500">Subtotal</span>
-              <span className="text-xl font-bold text-azul-profundo">${(product.price * quantity).toFixed(2)}</span>
+              <span className="text-xl font-bold text-azul-profundo">
+                ${(displayPrice * quantity).toFixed(2)}
+              </span>
             </div>
+            {selectedVariant && (
+              <p className="text-xs text-gray-400 mt-1">
+                Variante: <span className="font-medium text-azul-real">{selectedVariant.name}</span>
+              </p>
+            )}
           </div>
 
           {/* Add to cart button */}
           <button
             onClick={handleAddToCart}
+            disabled={hasVariants && !selectedVariant}
             className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 ${
               addedToCart
                 ? 'bg-green-500 text-white scale-[0.98]'
+                : hasVariants && !selectedVariant
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : 'bg-azul-brillante hover:bg-azul-real text-white hover:shadow-lg hover:shadow-azul-brillante/30'
             }`}
           >

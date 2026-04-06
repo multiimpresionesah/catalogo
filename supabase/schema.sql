@@ -30,6 +30,7 @@ CREATE TABLE products (
   category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
   is_active BOOLEAN DEFAULT true,
   is_featured BOOLEAN DEFAULT false,
+  tags TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );
@@ -44,6 +45,19 @@ CREATE TABLE product_images (
   display_order INT DEFAULT 0,
   is_primary BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- ============================================
+-- PRODUCT VARIANTS (sizes, finishes, etc.)
+-- ============================================
+CREATE TABLE product_variants (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  product_id UUID REFERENCES products(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,       -- e.g. "Lona 2x2m" or "Acabado Brillante"
+  price NUMERIC NOT NULL,   -- the exact price for this variant (replaces base price)
+  is_active BOOLEAN DEFAULT true,
+  display_order INT DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- ============================================
@@ -76,6 +90,7 @@ CREATE TABLE store_settings (
 ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE product_images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE product_variants ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sliders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE store_settings ENABLE ROW LEVEL SECURITY;
 
@@ -83,6 +98,7 @@ ALTER TABLE store_settings ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public read categories" ON categories FOR SELECT USING (true);
 CREATE POLICY "Public read products" ON products FOR SELECT USING (true);
 CREATE POLICY "Public read product_images" ON product_images FOR SELECT USING (true);
+CREATE POLICY "Public Read Variants" ON product_variants FOR SELECT USING (true);
 CREATE POLICY "Public read sliders" ON sliders FOR SELECT USING (true);
 CREATE POLICY "Public read store_settings" ON store_settings FOR SELECT USING (true);
 
@@ -91,7 +107,9 @@ CREATE POLICY "Public read store_settings" ON store_settings FOR SELECT USING (t
 -- ============================================
 CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_products_active ON products(is_active);
+CREATE INDEX idx_products_tags ON products USING GIN(tags);
 CREATE INDEX idx_product_images_product ON product_images(product_id);
+CREATE INDEX idx_product_variants_product ON product_variants(product_id);
 CREATE INDEX idx_sliders_active ON sliders(is_active, display_order);
 
 -- ============================================

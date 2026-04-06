@@ -31,7 +31,11 @@ export default function CheckoutPage() {
 
     // Build WhatsApp message with Unicode escape sequences for maximum compatibility
     const itemLines = items.map(
-      item => `%E2%80%A2 *${item.product.name}* (x${item.quantity}) %E2%80%94 $${(item.product.price * item.quantity).toFixed(2)}`
+      item => {
+        const price = item.variant ? item.variant.price : item.product.price;
+        const variantLabel = item.variant ? ` (${item.variant.name})` : '';
+        return `%E2%80%A2 *${item.product.name}${variantLabel}* (x${item.quantity}) %E2%80%94 $${(price * item.quantity).toFixed(2)}`;
+      }
     ).join('%0A');
 
     const deliveryText = deliveryOption === 'delivery' ? '%F0%9F%9A%80 Delivery (+$1.50)' : '%F0%9F%8F%A0 Recoger en tienda (Gratis)';
@@ -177,8 +181,10 @@ export default function CheckoutPage() {
             </h3>
 
             <div className="space-y-3">
-              {items.map(item => (
-                <div key={item.product.id} className="flex items-center gap-3 py-2 border-b border-azul-cielo/10 last:border-0">
+              {items.map(item => {
+                const unitPrice = item.variant ? item.variant.price : item.product.price;
+                return (
+                <div key={`${item.product.id}::${item.variant?.id ?? ''}`} className="flex items-center gap-3 py-2 border-b border-azul-cielo/10 last:border-0">
                   <div className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-azul-palido">
                     {item.image ? (
                       <img src={item.image} alt={item.product.name} className="w-full h-full object-cover" />
@@ -188,13 +194,14 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-azul-profundo truncate">{item.product.name}</p>
+                    {item.variant && <p className="text-[11px] text-azul-real font-medium">{item.variant.name}</p>}
                     <p className="text-xs text-gray-500">x{item.quantity}</p>
                   </div>
                   <span className="font-semibold text-azul-profundo text-sm">
-                    ${(item.product.price * item.quantity).toFixed(2)}
+                    ${(unitPrice * item.quantity).toFixed(2)}
                   </span>
                 </div>
-              ))}
+              );})}
             </div>
           </div>
         </div>

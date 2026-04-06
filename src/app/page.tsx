@@ -13,17 +13,23 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const categoryParam = searchParams.get('category');
+  const tagParam = searchParams.get('tag');
 
   const { searchQuery, setSearchQuery } = useCartStore();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(categoryParam);
+  const [selectedTag, setSelectedTag] = useState<string | null>(tagParam);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setSelectedCategory(categoryParam);
   }, [categoryParam]);
+
+  useEffect(() => {
+    setSelectedTag(tagParam);
+  }, [tagParam]);
 
   useEffect(() => {
     async function fetchData() {
@@ -33,6 +39,7 @@ function HomeContent() {
         supabase
           .from('products')
           .select(`*, category:categories(*), images:product_images(*)`)
+          // tags is a column on products, included by default via *
           .eq('is_active', true)
           .order('created_at', { ascending: false }),
         supabase
@@ -56,6 +63,10 @@ function HomeContent() {
       result = result.filter(p => p.category?.slug === selectedCategory);
     }
 
+    if (selectedTag) {
+      result = result.filter(p => p.tags && p.tags.includes(selectedTag));
+    }
+
     if (searchQuery.trim()) {
       const term = searchQuery.trim().toLowerCase();
       result = result.filter(
@@ -66,22 +77,31 @@ function HomeContent() {
     }
 
     return result;
-  }, [products, selectedCategory, searchQuery]);
+  }, [products, selectedCategory, selectedTag, searchQuery]);
 
   const handleCategorySelect = (slug: string | null) => {
     setSelectedCategory(slug);
-    // Clear search when selecting a category
     setSearchQuery('');
-    const params = new URLSearchParams(searchParams?.toString() || '');
-    if (slug) {
-      params.set('category', slug);
-    } else {
-      params.delete('category');
-    }
+    const params = new URLSearchParams();
+    if (slug) params.set('category', slug);
     router.push(`/?${params.toString()}`, { scroll: false });
   };
 
-  const pageTitle = selectedCategory
+  const handleTagClick = (tag: string) => {
+    setSelectedTag(tag);
+    setSelectedCategory(null);
+    setSearchQuery('');
+    router.push(`/?tag=${encodeURIComponent(tag)}`, { scroll: false });
+  };
+
+  const handleClearTag = () => {
+    setSelectedTag(null);
+    router.push('/', { scroll: false });
+  };
+
+  const pageTitle = selectedTag
+    ? `Etiqueta: #${selectedTag}`
+    : selectedCategory
     ? categories.find(c => c.slug === selectedCategory)?.name || 'Productos'
     : searchQuery.trim()
       ? `Resultados para "${searchQuery.trim()}"`
@@ -109,14 +129,27 @@ function HomeContent() {
               {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
             </p>
           </div>
-          {searchQuery.trim() && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="text-sm text-azul-profundo hover:text-azul-brillante transition-colors underline underline-offset-2"
-            >
-              Limpiar búsqueda
-            </button>
-          )}
+          <div className="flex items-center gap-3">
+            {selectedTag && (
+              <button
+                onClick={handleClearTag}
+                className="flex items-center gap-1 text-sm bg-azul-palido text-azul-real hover:text-azul-brillante transition-colors px-3 py-1 rounded-full border border-azul-cielo/40"
+              >
+                <span className="text-azul-brillante">#</span>{selectedTag}
+                <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+            {searchQuery.trim() && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-sm text-azul-profundo hover:text-azul-brillante transition-colors underline underline-offset-2"
+              >
+                Limpiar búsqueda
+              </button>
+            )}
+          </div>
         </div>
 
         {loading ? (
@@ -149,7 +182,7 @@ function HomeContent() {
                 className="animate-fade-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <ProductCard product={product} />
+                <ProductCard product={product} onTagClick={handleTagClick} />
               </div>
             ))}
           </div>

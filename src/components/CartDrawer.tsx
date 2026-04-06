@@ -77,7 +77,7 @@ export default function CartDrawer() {
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {items.map(item => (
               <div
-                key={item.product.id}
+                key={`${item.product.id}::${item.variant?.id ?? ''}`}
                 className="bg-azul-palido rounded-xl p-3 flex gap-3 animate-fade-in"
               >
                 {/* Thumbnail */}
@@ -98,7 +98,7 @@ export default function CartDrawer() {
                   <div className="flex items-start justify-between gap-1">
                     <h4 className="text-sm font-semibold text-azul-profundo line-clamp-1">{item.product.name}</h4>
                     <button
-                      onClick={() => removeFromCart(item.product.id)}
+                      onClick={() => removeFromCart(item.product.id, item.variant?.id)}
                       className="text-gray-400 hover:text-red-500 transition-colors flex-shrink-0 p-0.5"
                       aria-label="Eliminar"
                     >
@@ -108,26 +108,31 @@ export default function CartDrawer() {
                     </button>
                   </div>
 
-                  <p className="text-xs text-azul-brillante font-bold">${item.product.price.toFixed(2)}</p>
+                  {item.variant && (
+                    <p className="text-[11px] text-azul-real font-medium -mt-0.5 mb-0.5">
+                      {item.variant.name}
+                    </p>
+                  )}
+                  <p className="text-xs text-azul-brillante font-bold">${(item.variant ? item.variant.price : item.product.price).toFixed(2)}</p>
 
                   <div className="flex items-center justify-between mt-1.5">
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.product.id, item.quantity - 1, item.variant?.id)}
                         className="w-6 h-6 rounded bg-white text-azul-profundo hover:bg-azul-cielo/30 flex items-center justify-center font-bold text-xs transition-colors border border-azul-cielo/20"
                       >
                         −
                       </button>
                       <span className="w-7 text-center text-xs font-semibold text-azul-profundo">{item.quantity}</span>
                       <button
-                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.variant?.id)}
                         className="w-6 h-6 rounded bg-white text-azul-profundo hover:bg-azul-cielo/30 flex items-center justify-center font-bold text-xs transition-colors border border-azul-cielo/20"
                       >
                         +
                       </button>
                     </div>
                     <span className="text-sm font-bold text-azul-profundo">
-                      ${(item.product.price * item.quantity).toFixed(2)}
+                      ${((item.variant ? item.variant.price : item.product.price) * item.quantity).toFixed(2)}
                     </span>
                   </div>
                 </div>
