@@ -57,7 +57,7 @@ export default function ProductCard({ product, onTagClick }: ProductCardProps) {
           {/* Tags - Now more prominent above title */}
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-2">
-              {tags.slice(0, 2).map((tag) => (
+              {tags.map((tag) => (
                 <span
                   key={tag}
                   onClick={(e) => handleTagClick(e, tag)}
@@ -69,9 +69,6 @@ export default function ProductCard({ product, onTagClick }: ProductCardProps) {
                   {tag}
                 </span>
               ))}
-              {tags.length > 2 && (
-                <span className="text-[9px] text-gray-400 font-medium">+{tags.length - 2}</span>
-              )}
             </div>
           )}
 

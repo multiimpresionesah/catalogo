@@ -20,7 +20,7 @@ export default function CheckoutPage() {
   }, [fetchSettings]);
 
   const subtotal = getSubtotal();
-  const deliveryFee = deliveryOption === 'delivery' ? parseFloat(process.env.NEXT_PUBLIC_DELIVERY_FEE || '1.50') : 0;
+  const deliveryFee = deliveryOption === 'delivery' ? parseFloat(process.env.NEXT_PUBLIC_DELIVERY_FEE || '3.85') : 0;
   const total = subtotal + deliveryFee;
   const whatsappNumber = getSetting('whatsapp', process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '50360528774');
 
@@ -44,7 +44,7 @@ export default function CheckoutPage() {
       }
     ).join('%0A');
 
-    const deliveryText = deliveryOption === 'delivery' ? '%F0%9F%9A%80 Delivery (+$1.50)' : '%F0%9F%8F%A0 Recoger en tienda (Gratis)';
+    const deliveryText = deliveryOption === 'delivery' ? '%F0%9F%9A%80 Delivery (+$3.85)' : '%F0%9F%8F%A0 Recoger en tienda (Gratis)';
 
     const messageParts = [
       `%F0%9F%9B%8D *NUEVO PEDIDO - MULTI IMPRESIONES AH*%0A`,
@@ -172,7 +172,7 @@ export default function CheckoutPage() {
                   <span className="font-semibold text-azul-profundo">Delivery</span>
                   <p className="text-xs text-gray-500 mt-0.5">Entrega a domicilio</p>
                 </div>
-                <span className="font-bold text-azul-brillante text-sm">+$1.50</span>
+                <span className="font-bold text-azul-brillante text-sm">+$3.85</span>
               </label>
             </div>
           </div>
