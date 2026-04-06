@@ -76,7 +76,7 @@ export default function ProductCard({ product, onTagClick }: ProductCardProps) {
             {product.name}
           </h3>
           {product.description && (
-            <p className="text-[10px] sm:text-sm text-gray-500 mt-1 line-clamp-2 leading-tight">
+            <p className="text-[10px] sm:text-sm text-gray-500 mt-1 line-clamp-2 leading-tight whitespace-pre-line">
               {product.description}
             </p>
           )}

@@ -199,7 +199,7 @@ export default function ProductDetailPage() {
 
           {/* Description */}
           {product.description && (
-            <div className="prose prose-sm text-gray-600 leading-relaxed">
+            <div className="prose prose-sm text-gray-600 leading-relaxed whitespace-pre-line">
               <p>{product.description}</p>
             </div>
           )}
