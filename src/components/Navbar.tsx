@@ -121,7 +121,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3 px-4 pb-3 lg:px-8">
           {/* WhatsApp button */}
           <a
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`}
+            href={`https://wa.me/${getSetting('whatsapp', process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-shrink-0 flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 text-sm"

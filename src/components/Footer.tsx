@@ -51,12 +51,12 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/#about" className="text-white/70 hover:text-azul-cielo transition-colors">
+                <Link href="/quienes-somos" className="text-white/70 hover:text-azul-cielo transition-colors">
                   Quiénes Somos
                 </Link>
               </li>
               <li>
-                <Link href="/#values" className="text-white/70 hover:text-azul-cielo transition-colors">
+                <Link href="/nuestros-valores" className="text-white/70 hover:text-azul-cielo transition-colors">
                   Nuestros Valores
                 </Link>
               </li>

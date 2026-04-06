@@ -106,13 +106,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <h3 className="text-sm font-semibold text-azul-real uppercase tracking-wider mb-3">Informacion</h3>
           <ul className="space-y-1">
             <li>
-              <Link href="/#about" onClick={onClose} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-azul-profundo hover:bg-azul-palido transition-colors">
+              <Link href="/quienes-somos" onClick={onClose} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-azul-profundo hover:bg-azul-palido transition-colors">
                 <span className="text-lg">ℹ️</span>
                 <span className="font-medium">Quiénes Somos</span>
               </Link>
             </li>
             <li>
-              <Link href="/#values" onClick={onClose} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-azul-profundo hover:bg-azul-palido transition-colors">
+              <Link href="/nuestros-valores" onClick={onClose} className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-azul-profundo hover:bg-azul-palido transition-colors">
                 <span className="text-lg">⭐</span>
                 <span className="font-medium">Nuestros Valores</span>
               </Link>

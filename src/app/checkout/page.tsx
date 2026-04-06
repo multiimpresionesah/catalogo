@@ -1,22 +1,28 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
+import { useSettingsStore } from '@/store/settingsStore';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, getSubtotal, clearCart, openDrawer } = useCartStore();
+  const { getSetting, fetchSettings } = useSettingsStore();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [deliveryOption, setDeliveryOption] = useState<'pickup' | 'delivery'>('pickup');
   const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
 
+  React.useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
+
   const subtotal = getSubtotal();
   const deliveryFee = deliveryOption === 'delivery' ? parseFloat(process.env.NEXT_PUBLIC_DELIVERY_FEE || '1.50') : 0;
   const total = subtotal + deliveryFee;
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '50360528774';
+  const whatsappNumber = getSetting('whatsapp', process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '50360528774');
 
   const validate = () => {
     const newErrors: { name?: string; phone?: string } = {};
@@ -106,7 +112,7 @@ export default function CheckoutPage() {
                 <input
                   type="text"
                   value={name}
-                  onChange={(e) => { setName(e.target.value); setErrors(prev => ({ ...prev, name: undefined })); }}
+                  onChange={(e) => { setName(e.target.value); setErrors((prev: any) => ({ ...prev, name: undefined })); }}
                   placeholder="Ej: Juan Pérez"
                   className={`w-full px-4 py-3 rounded-lg border ${errors.name ? 'border-red-400 bg-red-50' : 'border-azul-cielo/30'} focus:outline-none focus:ring-2 focus:ring-azul-brillante text-azul-profundo placeholder-gray-400`}
                 />
@@ -118,7 +124,7 @@ export default function CheckoutPage() {
                 <input
                   type="tel"
                   value={phone}
-                  onChange={(e) => { setPhone(e.target.value); setErrors(prev => ({ ...prev, phone: undefined })); }}
+                  onChange={(e) => { setPhone(e.target.value); setErrors((prev: any) => ({ ...prev, phone: undefined })); }}
                   placeholder="Ej: 7890-1234"
                   className={`w-full px-4 py-3 rounded-lg border ${errors.phone ? 'border-red-400 bg-red-50' : 'border-azul-cielo/30'} focus:outline-none focus:ring-2 focus:ring-azul-brillante text-azul-profundo placeholder-gray-400`}
                 />
