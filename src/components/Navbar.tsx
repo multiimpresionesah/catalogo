@@ -3,6 +3,7 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
+import { useSettingsStore } from '@/store/settingsStore';
 import Sidebar from './Sidebar';
 import Image from 'next/image';
 
@@ -61,12 +62,16 @@ export default function Navbar() {
   const [mounted, setMounted] = useState(false);
   const { getItemCount, openDrawer } = useCartStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { fetchSettings, getSetting } = useSettingsStore();
 
   React.useEffect(() => {
     setMounted(true);
-  }, []);
+    fetchSettings();
+  }, [fetchSettings]);
 
   const itemCount = mounted ? getItemCount() : 0;
+  const logoUrl = getSetting('logo_url', '/logo-multi.png');
+  const storeName = getSetting('store_name', 'Multi Impresiones AH');
 
   return (
     <>
@@ -89,8 +94,8 @@ export default function Navbar() {
             <Link href="/" className="pointer-events-auto flex items-center hover:opacity-80 transition-opacity">
               <div className="relative h-12 w-48">
                 <Image
-                  src="/logo-multi.png"
-                  alt="Multi Impresiones AH Logo"
+                  src={logoUrl}
+                  alt={`${storeName} Logo`}
                   fill
                   className="object-contain"
                   priority
