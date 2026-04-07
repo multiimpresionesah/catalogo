@@ -20,7 +20,7 @@ export default function CheckoutPage() {
   }, [fetchSettings]);
 
   const subtotal = getSubtotal();
-  const deliveryFee = deliveryOption === 'delivery' ? parseFloat(process.env.NEXT_PUBLIC_DELIVERY_FEE || '3.85') : 0;
+  const deliveryFee = deliveryOption === 'delivery' ? 3.85 : 0;
   const total = subtotal + deliveryFee;
   const whatsappNumber = getSetting('whatsapp', process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '50360528774');
 
@@ -170,7 +170,7 @@ export default function CheckoutPage() {
                 />
                 <div className="flex-1">
                   <span className="font-semibold text-azul-profundo">Delivery</span>
-                  <p className="text-xs text-gray-500 mt-0.5">Entrega a domicilio</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Entrega a domicilio. Método de pago a contra entrega</p>
                 </div>
                 <span className="font-bold text-azul-brillante text-sm">+$3.85</span>
               </label>
