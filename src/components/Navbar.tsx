@@ -2,6 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import Sidebar from './Sidebar';
@@ -60,9 +61,10 @@ function SearchInputFallback() {
 
 export default function Navbar() {
   const [mounted, setMounted] = useState(false);
-  const { getItemCount, openDrawer } = useCartStore();
+  const { getItemCount, openDrawer, setSearchQuery } = useCartStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { fetchSettings, getSetting } = useSettingsStore();
+  const router = useRouter();
 
   React.useEffect(() => {
     setMounted(true);
@@ -91,7 +93,15 @@ export default function Navbar() {
 
           {/* Logo (center) */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <Link href="/" className="pointer-events-auto flex items-center hover:opacity-80 transition-opacity">
+            <Link 
+              href="/" 
+              onClick={(e) => {
+                e.preventDefault();
+                setSearchQuery('');
+                router.push('/');
+              }}
+              className="pointer-events-auto flex items-center hover:opacity-80 transition-opacity"
+            >
               <div className="relative h-12 w-48">
                 <Image
                   src={logoUrl}

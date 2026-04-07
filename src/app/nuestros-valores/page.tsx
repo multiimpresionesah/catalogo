@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: 'Conoce los valores fundamentales que guían nuestro trabajo en Multi Impresiones AH.',
 };
 
+export const dynamic = 'force-dynamic';
+
 async function getValuesContent() {
   const { data } = await supabase
     .from('store_settings')

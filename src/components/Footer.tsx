@@ -26,7 +26,23 @@ export default function Footer() {
     <footer className="bg-azul-profundo text-white mt-auto">
       {/* Main footer content */}
       <div className="max-w-7xl mx-auto px-4 py-12 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+          {/* Ubicación (Map) */}
+          <div>
+            <h3 className="text-xl font-bold mb-4 text-azul-cielo">Ubicación</h3>
+            <div className="w-full h-40 rounded-xl overflow-hidden shadow-lg border border-white/10 mb-4">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3872.6254865281708!2d-89.84855172405634!3d13.921319886488538!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f6297c418eef2bf%3A0x6305dce04ad6a056!2sMulti%20Impresores%20SV%20-%20PUBLICIDAD%20IMPRESA!5e0!3m2!1ses-419!2ssv!4v1775539220382!5m2!1ses-419!2ssv" 
+                width="100%" 
+                height="100%" 
+                style={{ border: 0 }} 
+                allowFullScreen={false} 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+
           {/* Brand */}
           <div>
             <h3 className="text-xl font-bold mb-4 text-azul-cielo">{getSetting('store_name', 'Multi Impresiones AH')}</h3>
