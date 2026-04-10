@@ -20,6 +20,15 @@ export const metadata: Metadata = {
     description: "Impresiones de alta calidad para tu negocio",
     type: "website",
   },
+  icons: {
+    icon: [
+      { url: "/favicon-mi/favicon-16x16.png", sizes: "16x16" },
+      { url: "/favicon-mi/favicon-32x32.png", sizes: "32x32" },
+      { url: "/favicon-mi/favicon.ico" },
+    ],
+    apple: "/favicon-mi/apple-touch-icon.png",
+  },
+  manifest: "/favicon-mi/site.webmanifest",
 };
 
 export default function RootLayout({
