@@ -49,7 +49,7 @@ export default async function QuienesSomosPage() {
             </h1>
             <div className="w-20 h-1.5 bg-azul-brillante rounded-full mb-8" />
             
-            <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-6">
+            <div className="prose prose-lg max-w-none text-gray-600 leading-relaxed space-y-6 text-justify">
               {content.split('\n').map((paragraph, index) => (
                 paragraph.trim() ? <p key={index}>{paragraph}</p> : <br key={index} />
               ))}
