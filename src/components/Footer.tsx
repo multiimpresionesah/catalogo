@@ -4,14 +4,27 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
 import { useSettingsStore } from '@/store/settingsStore';
+import { supabase } from '@/lib/supabase';
+import { Category } from '@/types';
 
 export default function Footer() {
   const [mounted, setMounted] = useState(false);
   const { openDrawer } = useCartStore();
   const { getSetting } = useSettingsStore();
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     setMounted(true);
+    
+    async function fetchCategories() {
+      const { data } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order');
+      if (data) setCategories(data);
+    }
+    fetchCategories();
   }, []);
 
   // Handle store access only after mount to avoid hydration mismatch
@@ -91,26 +104,15 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4 text-azul-cielo">Productos</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link href="/?category=banners" className="text-white/70 hover:text-azul-cielo transition-colors">
-                  🖼️ Banners
-                </Link>
-              </li>
-              <li>
-                <Link href="/?category=tazas" className="text-white/70 hover:text-azul-cielo transition-colors">
-                  ☕ Tazas
-                </Link>
-              </li>
-              <li>
-                <Link href="/?category=camisas" className="text-white/70 hover:text-azul-cielo transition-colors">
-                  👕 Camisas
-                </Link>
-              </li>
-              <li>
-                <Link href="/?category=facturas" className="text-white/70 hover:text-azul-cielo transition-colors">
-                  📄 Facturas
-                </Link>
-              </li>
+              {categories.length > 0 ? categories.map(cat => (
+                <li key={cat.id}>
+                  <Link href={`/?category=${cat.slug}`} className="text-white/70 hover:text-azul-cielo transition-colors">
+                    {cat.icon} {cat.name}
+                  </Link>
+                </li>
+              )) : (
+                <li className="text-white/50 text-xs italic">Cargando categorías...</li>
+              )}
             </ul>
           </div>
 
