@@ -28,10 +28,10 @@ export default function ProductCard({ product, onTagClick }: ProductCardProps) {
   };
 
   return (
-    <Link href={`/product/${product.id}`} className="block">
-      <div className="product-card bg-white rounded-xl overflow-hidden shadow-md border border-azul-cielo/20 group">
+    <Link href={`/product/${product.id}`} className="block h-full">
+      <div className="product-card h-full flex flex-col bg-white rounded-xl overflow-hidden shadow-md border border-azul-cielo/20 group">
         {/* Image */}
-        <div className="relative h-36 sm:h-56 bg-gradient-to-br from-azul-palido to-azul-cielo/20 overflow-hidden">
+        <div className="relative h-36 sm:h-56 flex-shrink-0 bg-gradient-to-br from-azul-palido to-azul-cielo/20 overflow-hidden">
           {primaryImage ? (
             <img
               src={primaryImage}
@@ -52,37 +52,37 @@ export default function ProductCard({ product, onTagClick }: ProductCardProps) {
           )}
         </div>
 
-        {/* Content */}
-        <div className="p-3 sm:p-4">
-          {/* Tags - Now more prominent above title */}
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  onClick={(e) => handleTagClick(e, tag)}
-                  className="inline-flex items-center text-[9px] sm:text-[10px] font-bold text-azul-brillante bg-azul-palido/50 px-2 py-0.5 rounded-md border border-azul-cielo/20"
-                >
-                  <svg className="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 8.5C4.67 8.5 4 7.83 4 7s.67-1.5 1.5-1.5S7 6.17 7 7s-.67 1.5-1.5 1.5z" />
-                  </svg>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
+        {/* Content — flex-col so the bottom section is always pushed down */}
+        <div className="p-3 sm:p-4 flex flex-col flex-1">
+          {/* Tags */}
+          <div className="flex flex-wrap gap-1 mb-2 min-h-[1.25rem]">
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                onClick={(e) => handleTagClick(e, tag)}
+                className="inline-flex items-center text-[9px] sm:text-[10px] font-bold text-azul-brillante bg-azul-palido/50 px-2 py-0.5 rounded-md border border-azul-cielo/20"
+              >
+                <svg className="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 8.5C4.67 8.5 4 7.83 4 7s.67-1.5 1.5-1.5S7 6.17 7 7s-.67 1.5-1.5 1.5z" />
+                </svg>
+                {tag}
+              </span>
+            ))}
+          </div>
 
-          <h3 className="font-bold text-azul-profundo text-xs sm:text-base line-clamp-1 group-hover:text-azul-brillante transition-colors">
-            {product.name}
-          </h3>
-          {product.description && (
-            <p className="text-[10px] sm:text-sm text-gray-500 mt-1 line-clamp-2 leading-tight whitespace-pre-line">
-              {product.description}
-            </p>
-          )}
+          {/* Name + description — grows to fill space */}
+          <div className="flex-1">
+            <h3 className="font-bold text-azul-profundo text-xs sm:text-base line-clamp-1 group-hover:text-azul-brillante transition-colors">
+              {product.name}
+            </h3>
+            {product.description && (
+              <p className="text-[10px] sm:text-sm text-gray-500 mt-1 line-clamp-2 leading-tight whitespace-pre-line">
+                {product.description}
+              </p>
+            )}
+          </div>
 
-
-
+          {/* Price + button — always at the bottom */}
           <div className="mt-2 sm:mt-3 flex flex-col gap-2 sm:gap-3">
             <div className="flex items-center justify-between">
               <span className="text-sm sm:text-lg font-bold text-azul-brillante">
