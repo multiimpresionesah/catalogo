@@ -79,9 +79,6 @@ export default function HeroSlider() {
             />
           )}
           
-          {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-azul-profundo/80 via-transparent to-azul-profundo/30" />
-
           {/* Content */}
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
             {slider.title && (
