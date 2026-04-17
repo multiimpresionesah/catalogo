@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -31,6 +32,8 @@ export const metadata: Metadata = {
   manifest: "/favicon-mi/site.webmanifest",
 };
 
+
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -43,6 +46,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <CartDrawer />
+        <Analytics />
       </body>
     </html>
   );

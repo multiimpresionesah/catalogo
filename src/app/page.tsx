@@ -8,7 +8,6 @@ import HeroSlider from '@/components/HeroSlider';
 import CategoryFilter from '@/components/CategoryFilter';
 import ProductCard from '@/components/ProductCard';
 import { useCartStore } from '@/store/cartStore';
-import { Analytics } from '@vercel/analytics/next';
 
 
 function HomeContent() {
@@ -111,7 +110,6 @@ function HomeContent() {
 
   return (
     <div>
-      <Analytics />
       <HeroSlider />
 
       <section className="max-w-7xl mx-auto">
