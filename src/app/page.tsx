@@ -8,6 +8,8 @@ import HeroSlider from '@/components/HeroSlider';
 import CategoryFilter from '@/components/CategoryFilter';
 import ProductCard from '@/components/ProductCard';
 import { useCartStore } from '@/store/cartStore';
+import { Analytics } from '@vercel/analytics/next';
+
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -102,13 +104,14 @@ function HomeContent() {
   const pageTitle = selectedTag
     ? `Etiqueta: #${selectedTag}`
     : selectedCategory
-    ? categories.find(c => c.slug === selectedCategory)?.name || 'Productos'
-    : searchQuery.trim()
-      ? `Resultados para "${searchQuery.trim()}"`
-      : 'Todos los Productos';
+      ? categories.find(c => c.slug === selectedCategory)?.name || 'Productos'
+      : searchQuery.trim()
+        ? `Resultados para "${searchQuery.trim()}"`
+        : 'Todos los Productos';
 
   return (
     <div>
+      <Analytics />
       <HeroSlider />
 
       <section className="max-w-7xl mx-auto">
