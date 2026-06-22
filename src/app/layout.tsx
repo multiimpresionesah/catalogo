@@ -12,9 +12,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Multi Impresiones AH | Impresiones de Alta Calidad",
+  title: "Multi Impresores SV | Impresiones de Alta Calidad",
   description:
-    "Tu mejor opción en impresiones. Banners, camisas, tazas, facturas y más. Personaliza todo con tu logo o diseño. Envío a domicilio disponible.",
+    "Tu mejor opción en impresiones. Banners, Sellos, Rotulaciones, Vinil, Microperforado, Imprenta y más. Personaliza todo con tu logo o diseño. Envío a domicilio disponible.",
   keywords: "impresiones, banners, tazas personalizadas, camisas, facturas, sublimación, serigrafía, El Salvador",
   openGraph: {
     title: "Multi Impresiones AH",
